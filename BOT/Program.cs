@@ -121,7 +121,14 @@ async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, Cancel
 
         Users.Add(chatId, new BOT.Models.User());
     }
-
+   
+    if (messageText == "FAQ")
+    {
+        await botClient.SendTextMwssageAsync(
+        chatId: chatId,
+        text: "Тут должен быть FAQ, который автор еще не составил.",
+        cancellationToken: cancellationToken);
+    }
 }
 Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
 {
