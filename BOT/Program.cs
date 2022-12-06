@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BOT.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,6 +57,33 @@ async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, Cancel
         cancellationToken: cancellationToken);
             Users[chatId].Age = int.Parse(messageText);
         }
+
+        if (command == "Регистрация2")
+        {
+            people[chatId] = "Регистрация3";
+            await botClient.SendTextMessageAsync(
+        chatId: chatId,
+        text: "Введите вашу страну",
+        cancellationToken: cancellationToken);
+            Users[chatId].City = messageText;
+        }
+
+        if (command == "Регистрация3")
+        {
+            people.Remove(chatId);
+            
+            Users[chatId].Country = messageText;
+            
+                 await botClient.SendTextMessageAsync(
+        chatId: chatId,
+        text: $"Спасибо за регистрацию! Вот ваши данные:\n{Users[chatId].Age}, {Users[chatId].Country}, {Users[chatId].City}",
+        cancellationToken: cancellationToken);
+            BotABWContext context = new BotABWContext();
+            context.Add(Users[chatId]);
+            context.SaveChanges();
+
+        }
+
         return;
     }
     if (messageText == "Проверка")
@@ -63,67 +91,11 @@ async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, Cancel
 
         await botClient.SendTextMessageAsync(
         chatId: chatId,
-        text: "Проверка бота: работа корректна",
+        text: "Проверка бота: ошибок не найдено.",
         cancellationToken: cancellationToken);
 
     }
-    if (messageText == "Привет")
-    {
-
-        await botClient.SendTextMessageAsync(
-        chatId: chatId,
-        text: "Привет",
-        cancellationToken: cancellationToken);
-
-    }
-    if (messageText == "Пока")
-    {
-
-        await botClient.SendTextMessageAsync(
-        chatId: chatId,
-        text: "Пока",
-        cancellationToken: cancellationToken);
-
-    }
-    if (messageText == "как дела?")
-    {
-
-        await botClient.SendTextMessageAsync(
-        chatId: chatId,
-        text: "нормально",
-        cancellationToken: cancellationToken);
-
-    }
-    if (messageText == "что делаешь?")
-    {
-
-        await botClient.SendTextMessageAsync(
-        chatId: chatId,
-        text: "что-то",
-        cancellationToken: cancellationToken);
-
-    }
-    if (messageText == "как настроение?")
-    {
-
-        await botClient.SendTextMessageAsync(
-        chatId: chatId,
-        text: "отличное",
-        cancellationToken: cancellationToken);
-
-
-    }
-
-    if (messageText == "Фотка")
-    {
-
-        Message messag = await botClient.SendPhotoAsync(
-chatId: chatId,
-photo: "https://github.com/TelegramBots/book/raw/master/src/docs/photo-ara.jpg",
-caption: "<b>Ara bird</b>. <i>Source</i>: <a href=\"https://pixabay.com\">Pixabay</a>",
-parseMode: ParseMode.Html,
-cancellationToken: cancellationToken);
-    }
+    
 
     ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
 {
