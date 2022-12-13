@@ -1,6 +1,8 @@
 ﻿using BOT.Models;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -71,13 +73,13 @@ async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, Cancel
         if (command == "Регистрация3")
         {
             people.Remove(chatId);
-            
+
             Users[chatId].Country = messageText;
-            
-                 await botClient.SendTextMessageAsync(
-        chatId: chatId,
-        text: $"Спасибо за регистрацию! Вот ваши данные:\n{Users[chatId].Age}, {Users[chatId].Country}, {Users[chatId].City}",
-        cancellationToken: cancellationToken);
+
+            await botClient.SendTextMessageAsync(
+   chatId: chatId,
+   text: $"Спасибо за регистрацию! Вот ваши данные:\n{Users[chatId].Age}, {Users[chatId].Country}, {Users[chatId].City}",
+   cancellationToken: cancellationToken);
             BotABWContext context = new BotABWContext();
             context.Add(Users[chatId]);
             context.SaveChanges();
@@ -95,11 +97,11 @@ async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, Cancel
         cancellationToken: cancellationToken);
 
     }
-    
+
 
     ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
 {
-        new KeyboardButton[] { "Регистрация", "FAQ" },
+        new KeyboardButton[] { "Регистрация", "FAQ", "Список клиентов" },
     })
     {
         ResizeKeyboard = true
@@ -121,15 +123,36 @@ async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, Cancel
 
         Users.Add(chatId, new BOT.Models.User());
     }
-   
+
     if (messageText == "FAQ")
     {
-        await botClient.SendTextMwssageAsync(
+        await botClient.SendTextMessageAsync(
         chatId: chatId,
         text: "Тут должен быть FAQ, который автор еще не составил.",
         cancellationToken: cancellationToken);
     }
+
+
+    if (messageText == "Список пользователей")
+
+    {
+        BotABWContext context = new BotABWContext();
+
+        BOT.Models.User[] table = context.Users.ToArray();
+        string text = "";
+        foreach (var user in table)
+        {
+            text += $"{user.Age}, {user.City}, {user.Country} ";
+        }
+        await botClient.SendTextMessageAsync(
+        chatId: chatId,
+
+        text: text,
+
+        cancellationToken: cancellationToken);
+    }
 }
+
 Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
 {
     var ErrorMessage = exception switch
